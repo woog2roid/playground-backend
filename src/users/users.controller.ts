@@ -8,6 +8,7 @@ import {
   Patch,
   Query,
   HttpException,
+  NotFoundException,
 } from '@nestjs/common';
 import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JoinRequestDto } from './dto/join-request.dto';
@@ -31,25 +32,14 @@ export class UsersController {
 
   @ApiOperation({ summary: 'id로 유저 검색' })
   @Get('/')
-  find(@Query('id') id: string) {
-    const user = this.usersService.find(id);
-    console.log(user);
-    return user;
+  async findById(@Query('id') id: string) {
+    return this.usersService.findById(id);
   }
 
   @ApiOperation({ summary: '회원 가입' })
   @Post('/join')
   async join(@Body() data: JoinRequestDto) {
-    const result = this.usersService.join(
-      data.id,
-      data.nickname,
-      data.password,
-    );
-    if (result) {
-      return;
-    } else {
-      throw new Error();
-    }
+    return this.usersService.join(data.id, data.nickname, data.password);
   }
 
   @ApiOperation({ summary: '회원 탈퇴' })
