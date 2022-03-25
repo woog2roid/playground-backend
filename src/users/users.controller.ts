@@ -5,25 +5,16 @@ import {
   Get,
   Param,
   Delete,
-  Patch,
   Query,
-  HttpException,
-  NotFoundException,
+  Response,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { LocalAuthGuard } from 'src/auth/local-auth.guard';
 import { JoinRequestDto } from './dto/join-request.dto';
 import { UsersService } from './users.service';
-
-//들어가야 하는 컨트롤러 목록
-/*
-1. find by id
-
-3. 회원가입
-4. 회원탈퇴
-
-5. 로그인
-6. 로그아웃
-*/
+import { Users } from './entities/users.entity';
+import { User } from '../utils/request-user.decorator';
 
 @ApiTags('User')
 @Controller('user')
@@ -47,5 +38,26 @@ export class UsersController {
   delete(@Param('id') id: string) {
     return '회원탈퇴';
     //return this.usersService.delete(+id, updateUserDto);
+  }
+
+  @ApiOperation({ summary: '로그인' })
+  @UseGuards(LocalAuthGuard)
+  @Post('/login')
+  async login(@User() user: Users) {
+    //Passport의 local-auth guard에서 session 처리까지 해주기 때문에
+    //따로 service 구현없이 user만 return한다.
+    return user;
+  }
+
+  //@ApiCookieAuth('connect.sid')
+  @ApiOperation({ summary: '로그아웃' })
+  //@UseGuards(LoggedInGuard)
+  @Post('logout')
+  async logout(@Response() res) {
+    return '로그아웃';
+    /*
+    res.clearCookie('connect.sid', { httpOnly: true });
+    return res.send('ok');
+    */
   }
 }

@@ -18,10 +18,14 @@ export class UsersService {
   ) {}
 
   async findById(id: string) {
-    const user = await this.usersRepository.findOne({
-      where: { id },
-      select: ['id', 'nickname'],
-    });
+    const user = await this.usersRepository
+      .findOne({
+        where: { id },
+        select: ['id', 'nickname'],
+      })
+      .catch((err) => {
+        console.log(err);
+      });
     if (user) {
       return user;
     } else {
@@ -31,9 +35,13 @@ export class UsersService {
 
   async join(id: string, nickname: string, password: string) {
     //id가 겹치는 회원이 있는지 확인
-    const exUser = await this.usersRepository.findOne({
-      where: { id },
-    });
+    const exUser = await this.usersRepository
+      .findOne({
+        where: { id },
+      })
+      .catch((err) => {
+        console.log(err);
+      });
     if (exUser) {
       throw new ForbiddenException('이미 존재하는 사용자입니다');
     }
@@ -46,6 +54,8 @@ export class UsersService {
     user.password = hashedPassword;
     console.log(user);
 
-    await this.usersRepository.save(user);
+    await this.usersRepository.save(user).catch((err) => {
+      console.log(err);
+    });
   }
 }
