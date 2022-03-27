@@ -23,9 +23,10 @@ export class LocalSerializer extends PassportSerializer {
     return await this.usersRepository
       .findOne({
         where: { id: userId },
-        select: ['id', 'nickname'],
       })
       .then((user) => {
+        //console.log('deserialize');
+        //console.log(user);
         done(null, user);
       })
       .catch((error) => done(error));
