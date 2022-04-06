@@ -8,36 +8,51 @@ import {
   Query,
   Response,
   UseGuards,
+  Request,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+
 import { LocalAuthGuard } from 'src/auth/local-auth.guard';
+import { LoggedInGuard, NotLoggedInGuard } from 'src/auth/is-logged-in.guards';
+
 import { JoinRequestDto } from './dto/join-request.dto';
-import { UsersService } from './users.service';
-import { Users } from './entities/users.entity';
 import { User } from '../utils/request-user.decorator';
+import { Users } from '../entities/users.entity';
+import { UsersService } from './users.service';
 
 @ApiTags('User')
 @Controller('user')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @ApiOperation({ summary: '본인 정보 불러오기' })
+  @ApiCookieAuth('connect.sid')
+  @UseGuards(LoggedInGuard)
+  @Get('/me')
+  async getMyProfile(@User() user: Users) {
+    return user;
+  }
+
   @ApiOperation({ summary: 'id로 유저 검색' })
+  @UseGuards(LoggedInGuard)
   @Get('/')
   async findById(@Query('id') id: string) {
     return this.usersService.findById(id);
   }
 
   @ApiOperation({ summary: '회원 가입' })
+  @UseGuards(NotLoggedInGuard)
   @Post('/join')
   async join(@Body() data: JoinRequestDto) {
     return this.usersService.join(data.id, data.nickname, data.password);
   }
 
   @ApiOperation({ summary: '회원 탈퇴' })
-  @Delete('/quit/:id')
-  delete(@Param('id') id: string) {
-    return '회원탈퇴';
-    //return this.usersService.delete(+id, updateUserDto);
+  @UseGuards(LoggedInGuard)
+  @Delete('/quit')
+  async delete(@User() user: Users) {
+    return this.usersService.delete(user.id);
   }
 
   @ApiOperation({ summary: '로그인' })
@@ -49,15 +64,13 @@ export class UsersController {
     return user;
   }
 
-  //@ApiCookieAuth('connect.sid')
   @ApiOperation({ summary: '로그아웃' })
-  //@UseGuards(LoggedInGuard)
-  @Post('logout')
-  async logout(@Response() res) {
-    return '로그아웃';
-    /*
-    res.clearCookie('connect.sid', { httpOnly: true });
-    return res.send('ok');
-    */
+  @ApiCookieAuth('connect.sid')
+  @UseGuards(LoggedInGuard)
+  @Post('/logout')
+  async logout(@Response() res, @Request() req) {
+    req.session.destroy(() => {
+      res.clearCookie('connect.sid', { httpOnly: true }).sendStatus(200);
+    });
   }
 }

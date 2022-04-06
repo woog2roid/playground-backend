@@ -48,7 +48,7 @@ async function bootstrap() {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  const config = new DocumentBuilder().setTitle('Playground API').build();
+  const config = new DocumentBuilder().setTitle('Playground API').addCookieAuth('connect.sid').build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
