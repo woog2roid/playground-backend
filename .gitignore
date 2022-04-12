@@ -40,3 +40,4 @@ goorm.manifest
 # configs, environment variable
 .env
 ormconfig.ts
+TODO.md
