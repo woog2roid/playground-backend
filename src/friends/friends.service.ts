@@ -14,7 +14,6 @@ import { Users } from '../users/entities/users.entity';
 import { Friends } from './entities/friends.entity';
 import { UsersRepository } from '../users/entities/users.repository';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CancelRequestDto } from './dto/cancel-request.dto';
 
 @Injectable()
 export class FriendsService {
@@ -26,7 +25,6 @@ export class FriendsService {
   ) {}
 
   async getAll(user: Users) {
-    //쿼리빌더를 이용해서 join 후에 find해야 할 듯....
     const joinedFriendTable = await this.friendsRepository
       .createQueryBuilder('friend')
       .leftJoin('friend.follower', 'follower')
@@ -74,17 +72,24 @@ export class FriendsService {
     await this.friendsRepository.save(request);
   }
 
-  async cancelRequest(cancelRequestDto: CancelRequestDto, user: Users) {
-    const followingId = cancelRequestDto.id;
-
-    const requestData = await this.friendsRepository.findOne({
-      where: { following: followingId, follower: user.id, friend: false },
-    });
-    if (!requestData) {
-      throw new NotFoundException('존재하지 않는 친구요청에 대한 요청입니다.');
+  async cancelRequest(relation: string, targetId: string, user: Users) {
+    if (relation === 'follower') {
+      const requestData = await this.friendsRepository.findOne({
+        where: { following: user.id, follower: targetId, friend: false },
+      });
+      if (!requestData) {
+        throw new NotFoundException('존재하지 않는 친구요청에 대한 요청입니다.');
+      }
+      await this.friendsRepository.delete({ id: requestData.id });
+    } else if (relation === 'following') {
+      const requestData = await this.friendsRepository.findOne({
+        where: { following: targetId, follower: user.id, friend: false },
+      });
+      if (!requestData) {
+        throw new NotFoundException('존재하지 않는 친구요청에 대한 요청입니다.');
+      }
+      await this.friendsRepository.delete({ id: requestData.id });
     }
-
-    await this.friendsRepository.delete(requestData);
   }
 
   async accept(acceptFriendDto: AcceptFriendDto, following: Users) {
@@ -98,12 +103,16 @@ export class FriendsService {
 
     requestData.friend = true;
     await this.friendsRepository.save(requestData);
+    console.log(requestData);
+    console.log(requestData.follower);
 
     const inverseData = new Friends();
     inverseData.following = requestData.follower;
     inverseData.follower = requestData.following;
     inverseData.friend = true;
     await this.friendsRepository.save(inverseData);
+
+    console.log(inverseData);
   }
 
   async remove(targetId: string, user: Users) {
