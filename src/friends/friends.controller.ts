@@ -39,7 +39,7 @@ export class FriendsController {
   @ApiOperation({ summary: '친구 요청 보내기' })
   @Post('/request')
   async request(@Body() requestFriendDto: RequestFriendDto, @User() user: Users) {
-    return this.friendService.request(requestFriendDto, user);
+    return this.friendService.request(requestFriendDto.id, user);
   }
 
   @ApiOperation({ summary: '친구 요청 거절 및 친구 요청 취소' })
@@ -51,12 +51,12 @@ export class FriendsController {
   @ApiOperation({ summary: '친구 요청 수락' })
   @Post('/accept')
   async accept(@Body() acceptFriendDto: AcceptFriendDto, @User() user: Users) {
-    return this.friendService.accept(acceptFriendDto, user);
+    return this.friendService.accept(acceptFriendDto.id, user);
   }
 
   @ApiOperation({ summary: '친구 삭제' })
-  @Delete(':id')
-  remove(@Param('id') targetId: string, @User() user: Users) {
+  @Delete('/')
+  remove(@Query('id') targetId: string, @User() user: Users) {
     return this.friendService.remove(targetId, user);
   }
 }

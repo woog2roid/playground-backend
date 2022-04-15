@@ -1,47 +1,38 @@
-import {
-  ConflictException,
-  ForbiddenException,
-  Injectable,
-  NotAcceptableException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 
-import { RequestFriendDto } from './dto/request-friend.dto';
-import { AcceptFriendDto } from './dto/accept-frined.dto';
-
-import { Connection, Repository } from 'typeorm';
+import { Connection } from 'typeorm';
 import { Users } from '../users/entities/users.entity';
 import { Friends } from './entities/friends.entity';
 import { UsersRepository } from '../users/entities/users.repository';
-import { InjectRepository } from '@nestjs/typeorm';
+import { FriendsRepository } from './entities/friends.repository';
 
 @Injectable()
 export class FriendsService {
   constructor(
-    @InjectRepository(Friends)
-    private friendsRepository: Repository<Friends>,
+    private friendsRepository: FriendsRepository,
     private usersRepository: UsersRepository,
     private connection: Connection,
   ) {}
 
+  //OK!
   async getAll(user: Users) {
-    const joinedFriendTable = await this.friendsRepository
+    const table = await this.friendsRepository
       .createQueryBuilder('friend')
       .leftJoin('friend.follower', 'follower')
       .leftJoin('friend.following', 'following')
       .select(['friend.id', 'follower.id', 'follower.nickname', 'following.id', 'following.nickname', 'friend']);
 
-    const friends = await joinedFriendTable
+    const friends = await table
       .where('friend.friend = :isFriend', { isFriend: true })
       .andWhere('friend.follower = :id', { id: user.id })
       .getMany();
 
-    const followings = await joinedFriendTable
+    const followings = await table
       .where('friend.friend = :isFriend', { isFriend: false })
       .andWhere('friend.follower = :id', { id: user.id })
       .getMany();
 
-    const followers = await joinedFriendTable
+    const followers = await table
       .where('friend.friend = :isFriend', { isFriend: false })
       .andWhere('friend.following = :id', { id: user.id })
       .getMany();
@@ -50,9 +41,8 @@ export class FriendsService {
     return data;
   }
 
-  async request(requestFriendDto: RequestFriendDto, follower: Users) {
-    const followingId = requestFriendDto.id;
-
+  //OK!
+  async request(followingId: string, follower: Users) {
     const following = await this.usersRepository.findById(followingId).catch((err) => console.log(err));
     if (!following) {
       throw new NotFoundException('존재하지 않는 사용자에게 친구요청 하였습니다.');
@@ -65,14 +55,23 @@ export class FriendsService {
       throw new NotAcceptableException('이미 요청하셨거나, 이미 친구인 회원입니다.');
     }
 
+    const inverseRequest = await this.friendsRepository.findOne({
+      where: { follower: followingId, following: follower.id },
+    });
+    if (inverseRequest) {
+      throw new NotAcceptableException('상대방이 친구 요청을 이미 보냈습니다.');
+    }
+
     const request = new Friends();
     request.follower = follower;
     request.following = following;
     request.friend = false;
-    await this.friendsRepository.save(request);
+    return this.friendsRepository.save(request);
   }
 
+  //OK!
   async cancelRequest(relation: string, targetId: string, user: Users) {
+    console.log(relation);
     if (relation === 'follower') {
       const requestData = await this.friendsRepository.findOne({
         where: { following: user.id, follower: targetId, friend: false },
@@ -80,7 +79,7 @@ export class FriendsService {
       if (!requestData) {
         throw new NotFoundException('존재하지 않는 친구요청에 대한 요청입니다.');
       }
-      await this.friendsRepository.delete({ id: requestData.id });
+      return this.friendsRepository.delete({ id: requestData.id });
     } else if (relation === 'following') {
       const requestData = await this.friendsRepository.findOne({
         where: { following: targetId, follower: user.id, friend: false },
@@ -88,31 +87,27 @@ export class FriendsService {
       if (!requestData) {
         throw new NotFoundException('존재하지 않는 친구요청에 대한 요청입니다.');
       }
-      await this.friendsRepository.delete({ id: requestData.id });
+      console.log(requestData);
+      return this.friendsRepository.delete({ id: requestData.id });
     }
   }
 
-  async accept(acceptFriendDto: AcceptFriendDto, following: Users) {
-    const followerId = acceptFriendDto.id;
-    const requestData = await this.friendsRepository.findOne({
-      where: { following: following.id, follower: followerId, friend: false },
-    });
+  //OK!
+  async accept(followerId: string, following: Users) {
+    const requestData = await this.friendsRepository.findOneWithUsersInfo(followerId, following.id, false);
+    console.log(requestData);
     if (!requestData) {
       throw new NotFoundException('존재하지 않는 친구요청에 대한 응답입니다.');
     }
 
     requestData.friend = true;
     await this.friendsRepository.save(requestData);
-    console.log(requestData);
-    console.log(requestData.follower);
 
     const inverseData = new Friends();
     inverseData.following = requestData.follower;
     inverseData.follower = requestData.following;
     inverseData.friend = true;
     await this.friendsRepository.save(inverseData);
-
-    console.log(inverseData);
   }
 
   async remove(targetId: string, user: Users) {
@@ -121,10 +116,10 @@ export class FriendsService {
       throw new NotFoundException('존재하지 않는 사용자에 대한 요청입니다.');
     }
 
-    await this.friendsRepository.delete({ follower: target, following: user }).catch((err) => {
+    this.friendsRepository.delete({ follower: target, following: user }).catch((err) => {
       console.log(err);
     });
-    await this.friendsRepository.delete({ following: target, follower: user }).catch((err) => {
+    this.friendsRepository.delete({ following: target, follower: user }).catch((err) => {
       console.log(err);
     });
   }

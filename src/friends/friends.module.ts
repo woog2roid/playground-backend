@@ -4,10 +4,10 @@ import { FriendsController } from './friends.controller';
 
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersRepository } from '../users/entities/users.repository';
-import { Friends } from './entities/friends.entity';
+import { FriendsRepository } from './entities/friends.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UsersRepository, Friends])],
+  imports: [TypeOrmModule.forFeature([UsersRepository, FriendsRepository])],
   controllers: [FriendsController],
   providers: [FriendsService],
 })
