@@ -10,6 +10,7 @@ import {
   UseGuards,
   Request,
   UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
 import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -28,14 +29,16 @@ export class UsersController {
 
   @ApiOperation({ summary: '본인 정보 불러오기' })
   @ApiCookieAuth('connect.sid')
-  @UseGuards(LoggedInGuard)
   @Get('/me')
   async getMyProfile(@User() user: Users) {
-    return user;
+    if (user) {
+      return user;
+    } else {
+      throw new NotFoundException('유저 정보를 찾을 수 없습니다.');
+    }
   }
 
   @ApiOperation({ summary: 'id로 유저 검색' })
-  @UseGuards(LoggedInGuard)
   @Get('/')
   async findById(@Query('id') id: string) {
     return this.usersService.findById(id);
