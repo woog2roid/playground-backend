@@ -62,6 +62,10 @@ export class FriendsService {
       throw new NotAcceptableException('상대방이 친구 요청을 이미 보냈습니다.');
     }
 
+    if (followingId === follower.id) {
+      throw new NotAcceptableException('자기 자신에게는 친구요청을 할 수 없습니다.');
+    }
+
     const request = new Friends();
     request.follower = follower;
     request.following = following;
