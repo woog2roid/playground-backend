@@ -1,26 +1,25 @@
 import { Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 
-import { Connection } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Connection, Repository } from 'typeorm';
 import { Users } from '../users/entities/users.entity';
 import { Friends } from './entities/friends.entity';
 import { UsersRepository } from '../users/entities/users.repository';
-import { FriendsRepository } from './entities/friends.repository';
 
 @Injectable()
 export class FriendsService {
   constructor(
-    private friendsRepository: FriendsRepository,
+    @InjectRepository(Friends) private friendsRepository: Repository<Friends>,
     private usersRepository: UsersRepository,
     private connection: Connection,
   ) {}
 
-  //OK!
   async getAll(user: Users) {
     const table = await this.friendsRepository
       .createQueryBuilder('friend')
-      .leftJoin('friend.follower', 'follower')
-      .leftJoin('friend.following', 'following')
-      .select(['friend.id', 'follower.id', 'follower.nickname', 'following.id', 'following.nickname', 'friend']);
+      .innerJoin('friend.follower', 'follower')
+      .innerJoin('friend.following', 'following')
+      .select(['friend.id', 'follower.id', 'follower.nickname', 'following.id', 'following.nickname', 'friend.friend']);
 
     const friends = await table
       .where('friend.friend = :isFriend', { isFriend: true })
@@ -41,7 +40,6 @@ export class FriendsService {
     return data;
   }
 
-  //OK!
   async request(followingId: string, follower: Users) {
     const following = await this.usersRepository.findById(followingId).catch((err) => console.log(err));
     if (!following) {
@@ -73,9 +71,7 @@ export class FriendsService {
     return this.friendsRepository.save(request);
   }
 
-  //OK!
   async cancelRequest(relation: string, targetId: string, user: Users) {
-    console.log(relation);
     if (relation === 'follower') {
       const requestData = await this.friendsRepository.findOne({
         where: { following: user.id, follower: targetId, friend: false },
@@ -91,15 +87,15 @@ export class FriendsService {
       if (!requestData) {
         throw new NotFoundException('존재하지 않는 친구요청에 대한 요청입니다.');
       }
-      console.log(requestData);
       return this.friendsRepository.delete({ id: requestData.id });
     }
   }
 
-  //OK!
   async accept(followerId: string, following: Users) {
-    const requestData = await this.friendsRepository.findOneWithUsersInfo(followerId, following.id, false);
-    console.log(requestData);
+    const requestData = await this.friendsRepository
+      .createQueryBuilder('friends')
+      .innerJoinAndSelect('friends.follower', 'follower', 'follower.id = :followerId', { followerId })
+      .getOne();
     if (!requestData) {
       throw new NotFoundException('존재하지 않는 친구요청에 대한 응답입니다.');
     }
@@ -109,7 +105,7 @@ export class FriendsService {
 
     const inverseData = new Friends();
     inverseData.following = requestData.follower;
-    inverseData.follower = requestData.following;
+    inverseData.follower = following;
     inverseData.friend = true;
     await this.friendsRepository.save(inverseData);
   }

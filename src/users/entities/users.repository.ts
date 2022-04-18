@@ -4,11 +4,6 @@ import { Users } from './users.entity';
 @EntityRepository(Users)
 export class UsersRepository extends Repository<Users> {
   findById(id: string) {
-    return this.createQueryBuilder()
-      .select('users.id')
-      .addSelect('users.nickname')
-      .from(Users, 'users')
-      .where('users.id = :id', { id })
-      .getOne();
+    return this.createQueryBuilder('users').where('users.id = :id', { id }).getOne();
   }
 }
