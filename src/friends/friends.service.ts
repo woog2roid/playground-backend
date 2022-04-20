@@ -1,7 +1,7 @@
 import { Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
-import { Connection, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Users } from '../users/entities/users.entity';
 import { Friends } from './entities/friends.entity';
 import { UsersRepository } from '../users/entities/users.repository';
@@ -11,7 +11,6 @@ export class FriendsService {
   constructor(
     @InjectRepository(Friends) private friendsRepository: Repository<Friends>,
     private usersRepository: UsersRepository,
-    private connection: Connection,
   ) {}
 
   async getAll(user: Users) {

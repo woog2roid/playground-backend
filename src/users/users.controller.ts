@@ -3,24 +3,24 @@ import {
   Controller,
   Post,
   Get,
-  Param,
   Delete,
   Query,
   Response,
   UseGuards,
   Request,
-  UnauthorizedException,
   NotFoundException,
 } from '@nestjs/common';
 import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+
+import { UsersService } from './users.service';
 
 import { LocalAuthGuard } from 'src/auth/local-auth.guard';
 import { LoggedInGuard, NotLoggedInGuard } from 'src/auth/is-logged-in.guards';
 
 import { JoinRequestDto } from './dto/join-request.dto';
+
 import { User } from '../utils/request-user.decorator';
 import { Users } from './entities/users.entity';
-import { UsersService } from './users.service';
 
 @ApiTags('User')
 @Controller('user')
@@ -52,6 +52,7 @@ export class UsersController {
   }
 
   @ApiOperation({ summary: '회원 탈퇴' })
+  @ApiCookieAuth('connect.sid')
   @UseGuards(LoggedInGuard)
   @Delete('/quit')
   async delete(@User() user: Users) {
@@ -62,8 +63,6 @@ export class UsersController {
   @UseGuards(LocalAuthGuard)
   @Post('/login')
   async login(@User() user: Users) {
-    //Passport의 local-auth guard에서 session 처리까지 해주기 때문에
-    //따로 service 구현없이 user만 return한다.
     return user;
   }
 
