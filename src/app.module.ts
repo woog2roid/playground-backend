@@ -4,9 +4,10 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import ormconfig from 'ormconfig';
 
-import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
-import { FriendsModule } from './friends/friends.module';
+import { UsersModule } from './api/users/users.module';
+import { FriendsModule } from './api/friends/friends.module';
+import { ChatsModule } from './api/chats/chats.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { FriendsModule } from './friends/friends.module';
     UsersModule,
     AuthModule,
     FriendsModule,
+    ChatsModule,
   ],
   controllers: [],
   providers: [],

@@ -1,8 +1,8 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { Connection } from 'typeorm';
-import { Users } from './entities/users.entity';
-import { UsersRepository } from './entities/users.repository';
+import { Users } from '../../entities/Users.entity';
+import { UsersRepository } from '../../entities/Users.repository';
 
 import bcrypt from 'bcrypt';
 

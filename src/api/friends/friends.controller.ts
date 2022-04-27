@@ -8,8 +8,8 @@ import { LoggedInGuard } from 'src/auth/is-logged-in.guards';
 import { RequestFriendDto } from './dto/request-friend.dto';
 import { AcceptFriendDto } from './dto/accept-frined.dto';
 
-import { User } from '../utils/request-user.decorator';
-import { Users } from '../users/entities/users.entity';
+import { User } from '../../utils/request-user.decorator';
+import { Users } from '../../entities/Users.entity';
 
 @ApiTags('Friends')
 @ApiCookieAuth('connect.sid')

@@ -19,8 +19,8 @@ import { LoggedInGuard, NotLoggedInGuard } from 'src/auth/is-logged-in.guards';
 
 import { JoinRequestDto } from './dto/join-request.dto';
 
-import { User } from '../utils/request-user.decorator';
-import { Users } from './entities/users.entity';
+import { User } from '../../utils/request-user.decorator';
+import { Users } from '../../entities/Users.entity';
 
 @ApiTags('User')
 @Controller('user')

@@ -1,4 +1,3 @@
-import { Chats } from 'src/chats/entities/chats.entity';
 import {
   Column,
   CreateDateColumn,
@@ -11,7 +10,9 @@ import {
   OneToMany,
   JoinColumn,
 } from 'typeorm';
-import { Friends } from '../../friends/entities/friends.entity';
+import { Friends } from './Friends.entity';
+import { Chats } from './Chats.entity';
+import { ChatRooms } from './ChatRooms.entity';
 
 @Entity({ schema: 'playground', name: 'Users' })
 export class Users {
@@ -33,10 +34,15 @@ export class Users {
   @DeleteDateColumn()
   deletedAt: Date | null;
 
-  //relations, from here.
   @OneToMany(() => Friends, (friend) => friend.following)
   followings: Friends[];
 
   @OneToMany(() => Friends, (friend) => friend.follower)
   followers: Friends[];
+
+  @OneToMany(() => Chats, (chat) => chat.sender)
+  chats: Chats[];
+
+  @ManyToMany(() => ChatRooms, (chatRoom) => chatRoom.members)
+  chatRooms: ChatRooms[];
 }

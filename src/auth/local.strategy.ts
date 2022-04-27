@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
 import bcrypt from 'bcrypt';
 
-import { Users } from '../users/entities/users.entity';
+import { Users } from '../entities/Users.entity';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {

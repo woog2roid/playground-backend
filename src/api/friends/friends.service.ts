@@ -2,8 +2,8 @@ import { Injectable, NotAcceptableException, NotFoundException } from '@nestjs/c
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Friends } from './entities/friends.entity';
-import { UsersRepository } from '../users/entities/users.repository';
+import { Friends } from '../../entities/Friends.entity';
+import { UsersRepository } from '../../entities/Users.repository';
 
 @Injectable()
 export class FriendsService {
