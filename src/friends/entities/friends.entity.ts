@@ -3,29 +3,26 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  ManyToMany,
-  JoinTable,
-  PrimaryColumn,
   UpdateDateColumn,
   PrimaryGeneratedColumn,
-  OneToOne,
   ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { Users } from 'src/users/entities/users.entity';
 
-@Entity({ schema: 'playground', name: 'friend' })
+@Entity({ schema: 'playground', name: 'Friends' })
 export class Friends {
   @PrimaryGeneratedColumn({ name: 'id', type: 'int' })
   id: number;
 
-  @ManyToOne(() => Users, (users) => users.followings)
-  follower: Users;
-
-  @ManyToOne(() => Users, (users) => users.followers)
-  following: Users;
-
   @Column({ name: 'friend', type: 'boolean' })
   friend: boolean;
+
+  @Column({ name: 'followerId', type: 'string' })
+  followerId: string;
+
+  @Column({ name: 'followingId', type: 'string' })
+  followingId: string;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -35,4 +32,12 @@ export class Friends {
 
   @DeleteDateColumn()
   deletedAt: Date | null;
+
+  @ManyToOne(() => Users, (users) => users.followers)
+  @JoinColumn([{ name: 'followerId', referencedColumnName: 'id' }])
+  follower: Users;
+
+  @ManyToOne(() => Users, (users) => users.followings)
+  @JoinColumn([{ name: 'followingId', referencedColumnName: 'id' }])
+  following: Users;
 }

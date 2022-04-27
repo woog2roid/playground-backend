@@ -1,3 +1,4 @@
+import { Chats } from 'src/chats/entities/chats.entity';
 import {
   Column,
   CreateDateColumn,
@@ -12,7 +13,7 @@ import {
 } from 'typeorm';
 import { Friends } from '../../friends/entities/friends.entity';
 
-@Entity({ schema: 'playground', name: 'users' })
+@Entity({ schema: 'playground', name: 'Users' })
 export class Users {
   @PrimaryColumn({ name: 'id', type: 'varchar', unique: true, length: 30 })
   id: string;
@@ -33,9 +34,9 @@ export class Users {
   deletedAt: Date | null;
 
   //relations, from here.
-  @OneToMany(() => Friends, (follow) => follow.following)
+  @OneToMany(() => Friends, (friend) => friend.following)
   followings: Friends[];
 
-  @OneToMany(() => Friends, (follow) => follow.follower)
+  @OneToMany(() => Friends, (friend) => friend.follower)
   followers: Friends[];
 }
