@@ -1,15 +1,19 @@
-import { Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Friends } from '../../entities/Friends.entity';
-import { UsersRepository } from '../../entities/Users.repository';
+import { Users } from '../../entities/Users.entity';
 
 @Injectable()
 export class FriendsService {
   constructor(
     @InjectRepository(Friends) private friendsRepository: Repository<Friends>,
-    private usersRepository: UsersRepository,
+    @InjectRepository(Users) private usersRepository: Repository<Users>,
   ) {}
 
   async getAll(userId: string) {
@@ -17,7 +21,14 @@ export class FriendsService {
       .createQueryBuilder('friend')
       .innerJoin('friend.follower', 'follower')
       .innerJoin('friend.following', 'following')
-      .select(['friend.id', 'follower.id', 'follower.nickname', 'following.id', 'following.nickname', 'friend.friend']);
+      .select([
+        'friend.id',
+        'follower.id',
+        'follower.nickname',
+        'following.id',
+        'following.nickname',
+        'friend.friend',
+      ]);
 
     const friends = await table
       .where('friend.friend = :isFriend', { isFriend: true })
@@ -39,27 +50,39 @@ export class FriendsService {
   }
 
   async request(followingId: string, followerId: string) {
-    const followingUser = await this.usersRepository.findById(followingId).catch((err) => console.log(err));
+    const followingUser = await this.usersRepository
+      .findOne({ where: { id: followingId } })
+      .catch((err) => console.log(err));
     if (!followingUser) {
-      throw new NotFoundException('존재하지 않는 사용자에게 친구요청 하였습니다.');
+      throw new NotFoundException(
+        '존재하지 않는 사용자에게 친구요청 하였습니다.',
+      );
     }
 
     const exRequest = await this.friendsRepository.findOne({
       where: { followerId, followingId },
     });
     if (exRequest) {
-      throw new NotAcceptableException('이미 요청하셨거나, 이미 친구인 회원입니다.');
+      throw new NotAcceptableException(
+        '이미 요청하셨거나, 이미 친구인 회원입니다.',
+      );
     }
 
     const inverseRequest = await this.friendsRepository.findOne({
-      where: { followerId: followingId, followingId: followerId, friend: false },
+      where: {
+        followerId: followingId,
+        followingId: followerId,
+        friend: false,
+      },
     });
     if (inverseRequest) {
       throw new NotAcceptableException('상대방이 친구 요청을 이미 보냈습니다.');
     }
 
     if (followingId === followerId) {
-      throw new NotAcceptableException('자기 자신에게는 친구요청을 할 수 없습니다.');
+      throw new NotAcceptableException(
+        '자기 자신에게는 친구요청을 할 수 없습니다.',
+      );
     }
 
     const request = new Friends();
@@ -80,7 +103,9 @@ export class FriendsService {
   }
 
   async accept(followerId: string, followingId: string) {
-    const requestData = await this.friendsRepository.findOne({ where: { followerId, followingId, friend: false } });
+    const requestData = await this.friendsRepository.findOne({
+      where: { followerId, followingId, friend: false },
+    });
     if (!requestData) {
       throw new NotFoundException('존재하지 않는 친구요청에 대한 응답입니다.');
     }
@@ -96,16 +121,22 @@ export class FriendsService {
   }
 
   async remove(targetId: string, userId: string) {
-    const targetUser = await this.usersRepository.findById(targetId).catch((err) => console.log(err));
+    const targetUser = await this.usersRepository
+      .findOne({ where: { id: targetId } })
+      .catch((err) => console.log(err));
     if (!targetUser) {
       throw new NotFoundException('존재하지 않는 사용자에 대한 요청입니다.');
     }
 
-    this.friendsRepository.delete({ followerId: targetId, followingId: userId }).catch((err) => {
-      console.log(err);
-    });
-    this.friendsRepository.delete({ followingId: targetId, followerId: userId }).catch((err) => {
-      console.log(err);
-    });
+    this.friendsRepository
+      .delete({ followerId: targetId, followingId: userId })
+      .catch((err) => {
+        console.log(err);
+      });
+    this.friendsRepository
+      .delete({ followingId: targetId, followerId: userId })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 }

@@ -1,17 +1,26 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
-import { Connection } from 'typeorm';
+import { Connection, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from '../../entities/Users.entity';
-import { UsersRepository } from '../../entities/Users.repository';
 
 import bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
-  constructor(private usersRepository: UsersRepository, private connection: Connection) {}
+  constructor(
+    @InjectRepository(Users) private usersRepository: Repository<Users>,
+    private connection: Connection,
+  ) {}
 
   async findById(id: string) {
-    const user = await this.usersRepository.findById(id).catch((err) => console.log(err));
+    const user = await this.usersRepository
+      .findOne({ where: { id } })
+      .catch((err) => console.log(err));
     if (user) {
       return user;
     } else {
@@ -20,7 +29,9 @@ export class UsersService {
   }
 
   async join(id: string, nickname: string, password: string) {
-    const exUser = await this.usersRepository.findById(id).catch((err) => console.log(err));
+    const exUser = await this.usersRepository
+      .findOne({ where: { id } })
+      .catch((err) => console.log(err));
     if (exUser) {
       throw new ForbiddenException('이미 존재하는 사용자입니다.');
     }
