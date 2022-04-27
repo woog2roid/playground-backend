@@ -3,7 +3,9 @@ import { Observable } from 'rxjs';
 
 @Injectable()
 export class LoggedInGuard implements CanActivate {
-  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
+  canActivate(
+    context: ExecutionContext,
+  ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
     return request.isAuthenticated();
   }
@@ -11,7 +13,9 @@ export class LoggedInGuard implements CanActivate {
 
 @Injectable()
 export class NotLoggedInGuard implements CanActivate {
-  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
+  canActivate(
+    context: ExecutionContext,
+  ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
     return !request.isAuthenticated();
   }

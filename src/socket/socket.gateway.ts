@@ -12,7 +12,9 @@ import { Server, Socket } from 'socket.io';
 import { socketMemory as memory } from './socket-memory';
 
 @WebSocketGateway({ namespace: /\/ws-.+/ })
-export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export class SocketGateway
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer() public server: Server;
 
   //afterInit, handdle Connection, disconnection 등은 이미
