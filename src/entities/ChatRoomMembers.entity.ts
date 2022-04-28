@@ -12,7 +12,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Users } from './Users.entity';
-import { Chats } from './Chats.entity';
+import { ChatRooms } from './ChatRooms.entity';
 
 @Entity({ schema: 'playground', name: 'ChatRoomMembers' })
 export class ChatRoomMembers {
@@ -27,4 +27,24 @@ export class ChatRoomMembers {
 
   @DeleteDateColumn()
   deletedAt: Date | null;
+
+  @Column({ name: 'chatRoomId', type: 'int' })
+  chatRoomId: number;
+
+  @Column({ name: 'userId', type: 'varchar' })
+  userId: string;
+
+  @ManyToOne(() => ChatRooms, (chatRoom) => chatRoom.members, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn([{ name: 'chatRoomId', referencedColumnName: 'id' }])
+  chatRoom: ChatRooms;
+
+  @ManyToOne(() => Users, (users) => users.chatRooms, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn([{ name: 'userId', referencedColumnName: 'id' }])
+  user: Users;
 }

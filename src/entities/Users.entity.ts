@@ -13,6 +13,7 @@ import {
 import { Friends } from './Friends.entity';
 import { Chats } from './Chats.entity';
 import { ChatRooms } from './ChatRooms.entity';
+import { ChatRoomMembers } from './ChatRoomMembers.entity';
 
 @Entity({ schema: 'playground', name: 'Users' })
 export class Users {
@@ -45,4 +46,7 @@ export class Users {
 
   @ManyToMany(() => ChatRooms, (chatRoom) => chatRoom.members)
   chatRooms: ChatRooms[];
+
+  @OneToMany(() => ChatRoomMembers, (chatRoomMember) => chatRoomMember.userId)
+  chatRoomMembers: ChatRoomMembers[];
 }

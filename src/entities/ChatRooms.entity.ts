@@ -11,8 +11,8 @@ import {
   OneToMany,
   JoinColumn,
 } from 'typeorm';
-import { Users } from './Users.entity';
 import { Chats } from './Chats.entity';
+import { ChatRoomMembers } from './ChatRoomMembers.entity';
 
 @Entity({ schema: 'playground', name: 'ChatRoom' })
 export class ChatRooms {
@@ -31,6 +31,9 @@ export class ChatRooms {
   @OneToMany(() => Chats, (chat) => chat.roomId)
   chats: Chats[];
 
-  @ManyToMany(() => Users, (user) => user.chatRooms)
-  members: Users[];
+  @OneToMany(
+    () => ChatRoomMembers,
+    (chatRoomMemeber) => chatRoomMemeber.chatRoomId,
+  )
+  members: ChatRoomMembers[];
 }
