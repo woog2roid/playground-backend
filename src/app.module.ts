@@ -5,17 +5,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import ormconfig from 'ormconfig';
 
 import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './api/users/users.module';
-import { FriendsModule } from './api/friends/friends.module';
+import { UserModule } from './api/user/user.module';
+import { FriendModule } from './api/friend/friend.module';
 import { ChatsModule } from './api/chats/chats.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot(ormconfig),
-    UsersModule,
+    UserModule,
     AuthModule,
-    FriendsModule,
+    FriendModule,
     ChatsModule,
   ],
   controllers: [],

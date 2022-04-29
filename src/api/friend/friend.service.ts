@@ -10,7 +10,7 @@ import { Friends } from '../../entities/Friends.entity';
 import { Users } from '../../entities/Users.entity';
 
 @Injectable()
-export class FriendsService {
+export class FriendService {
   constructor(
     @InjectRepository(Friends) private friendsRepository: Repository<Friends>,
     @InjectRepository(Users) private usersRepository: Repository<Users>,

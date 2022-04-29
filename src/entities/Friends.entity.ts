@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { Users } from './Users.entity';
 
-@Entity({ schema: 'playground', name: 'Friends' })
+@Entity({ schema: 'playground', name: 'friends' })
 export class Friends {
   @PrimaryGeneratedColumn({ name: 'id', type: 'int' })
   id: number;
@@ -33,11 +33,11 @@ export class Friends {
   @DeleteDateColumn()
   deletedAt: Date | null;
 
-  @ManyToOne(() => Users, (users) => users.followers)
+  @ManyToOne(() => Users, (user) => user.followers)
   @JoinColumn([{ name: 'followerId', referencedColumnName: 'id' }])
   follower: Users;
 
-  @ManyToOne(() => Users, (users) => users.followings)
+  @ManyToOne(() => Users, (user) => user.followings)
   @JoinColumn([{ name: 'followingId', referencedColumnName: 'id' }])
   following: Users;
 }

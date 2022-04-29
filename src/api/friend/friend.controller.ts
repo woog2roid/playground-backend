@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { FriendsService } from './friends.service';
+import { FriendService } from './friend.service';
 
 import { LoggedInGuard } from 'src/auth/is-logged-in.guards';
 
@@ -19,12 +19,12 @@ import { AcceptFriendDto } from './dto/accept-frined.dto';
 import { User } from '../../utils/request-user.decorator';
 import { Users } from '../../entities/Users.entity';
 
-@ApiTags('Friends')
+@ApiTags('Friend')
 @ApiCookieAuth('connect.sid')
 @UseGuards(LoggedInGuard)
 @Controller('/friend')
-export class FriendsController {
-  constructor(private readonly friendService: FriendsService) {}
+export class FriendController {
+  constructor(private readonly friendService: FriendService) {}
 
   @ApiOperation({ summary: '모든 친구 관계 불러오기' })
   @Get('/')

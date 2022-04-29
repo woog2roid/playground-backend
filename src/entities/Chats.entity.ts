@@ -14,7 +14,7 @@ import {
 import { Users } from './Users.entity';
 import { ChatRooms } from './ChatRooms.entity';
 
-@Entity({ schema: 'playground', name: 'Chats' })
+@Entity({ schema: 'playground', name: 'chats' })
 export class Chats {
   @PrimaryColumn({ name: 'id', type: 'int', unique: true })
   id: number;

@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { UsersService } from './users.service';
+import { UserService } from './user.service';
 
 import { LocalAuthGuard } from 'src/auth/local-auth.guard';
 import { LoggedInGuard, NotLoggedInGuard } from 'src/auth/is-logged-in.guards';
@@ -24,8 +24,8 @@ import { Users } from '../../entities/Users.entity';
 
 @ApiTags('User')
 @Controller('user')
-export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+export class UserController {
+  constructor(private readonly userService: UserService) {}
 
   @ApiOperation({ summary: '본인 정보 불러오기' })
   @ApiCookieAuth('connect.sid')
@@ -41,14 +41,14 @@ export class UsersController {
   @ApiOperation({ summary: 'id로 유저 검색' })
   @Get('/')
   async findById(@Query('id') id: string) {
-    return this.usersService.findById(id);
+    return this.userService.findById(id);
   }
 
   @ApiOperation({ summary: '회원 가입' })
   @UseGuards(NotLoggedInGuard)
   @Post('/join')
   async join(@Body() data: JoinRequestDto) {
-    return this.usersService.join(data.id, data.nickname, data.password);
+    return this.userService.join(data.id, data.nickname, data.password);
   }
 
   @ApiOperation({ summary: '회원 탈퇴' })
@@ -56,7 +56,7 @@ export class UsersController {
   @UseGuards(LoggedInGuard)
   @Delete('/quit')
   async delete(@User() user: Users) {
-    return this.usersService.delete(user.id);
+    return this.userService.delete(user.id);
   }
 
   @ApiOperation({ summary: '로그인' })
