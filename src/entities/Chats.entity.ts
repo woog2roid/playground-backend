@@ -10,13 +10,14 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Users } from './Users.entity';
 import { ChatRooms } from './ChatRooms.entity';
 
 @Entity({ schema: 'playground', name: 'chats' })
 export class Chats {
-  @PrimaryColumn({ name: 'id', type: 'int', unique: true })
+  @PrimaryGeneratedColumn({ name: 'id', type: 'int' })
   id: number;
 
   @Column({ name: 'senderId', type: 'string' })
@@ -24,6 +25,9 @@ export class Chats {
 
   @Column({ name: 'roomId', type: 'string' })
   roomId: string;
+
+  @Column({ name: 'message', type: 'text' })
+  message: string;
 
   @CreateDateColumn()
   createdAt: Date;

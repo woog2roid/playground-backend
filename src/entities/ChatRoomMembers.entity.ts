@@ -10,13 +10,14 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Users } from './Users.entity';
 import { ChatRooms } from './ChatRooms.entity';
 
 @Entity({ schema: 'playground', name: 'chat_room_members' })
 export class ChatRoomMembers {
-  @PrimaryColumn({ name: 'id', type: 'int', unique: true })
+  @PrimaryGeneratedColumn({ name: 'id', type: 'int' })
   id: number;
 
   @CreateDateColumn()
