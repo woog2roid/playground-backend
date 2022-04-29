@@ -6,15 +6,13 @@ import {
   Delete,
   UseGuards,
   Query,
+  Param,
 } from '@nestjs/common';
 import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { FriendService } from './friend.service';
 
 import { LoggedInGuard } from 'src/auth/is-logged-in.guards';
-
-import { RequestFriendDto } from './dto/request-friend.dto';
-import { AcceptFriendDto } from './dto/accept-frined.dto';
 
 import { User } from '../../utils/request-user.decorator';
 import { Users } from '../../entities/Users.entity';
@@ -33,12 +31,9 @@ export class FriendController {
   }
 
   @ApiOperation({ summary: '친구 요청 보내기' })
-  @Post('/request')
-  async sendRequest(
-    @Body() requestFriendDto: RequestFriendDto,
-    @User() user: Users,
-  ) {
-    return this.friendService.sendRequest(requestFriendDto.id, user.id);
+  @Post('/request/:id')
+  async sendRequest(@Param('id') targetId: string, @User() user: Users) {
+    return this.friendService.sendRequest(targetId, user.id);
   }
 
   @ApiOperation({ summary: '친구 요청 거절 및 친구 요청 취소' })
@@ -56,12 +51,9 @@ export class FriendController {
   }
 
   @ApiOperation({ summary: '친구 요청 수락' })
-  @Post('/accept')
-  async acceptRequest(
-    @Body() acceptFriendDto: AcceptFriendDto,
-    @User() user: Users,
-  ) {
-    return this.friendService.acceptRequest(acceptFriendDto.id, user.id);
+  @Post('/accept/:id')
+  async acceptRequest(@Param('id') targetId: string, @User() user: Users) {
+    return this.friendService.acceptRequest(targetId, user.id);
   }
 
   @ApiOperation({ summary: '친구 삭제' })
