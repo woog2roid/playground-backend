@@ -16,7 +16,7 @@ export class FriendService {
     @InjectRepository(Users) private usersRepository: Repository<Users>,
   ) {}
 
-  async getAll(userId: string) {
+  async getAllRelations(userId: string) {
     const table = await this.friendsRepository
       .createQueryBuilder('friend')
       .innerJoin('friend.follower', 'follower')
@@ -49,7 +49,7 @@ export class FriendService {
     return data;
   }
 
-  async request(followingId: string, followerId: string) {
+  async sendRequest(followingId: string, followerId: string) {
     const followingUser = await this.usersRepository
       .findOne({ where: { id: followingId } })
       .catch((err) => console.log(err));
@@ -102,7 +102,7 @@ export class FriendService {
     await this.friendsRepository.delete({ id: requestData.id });
   }
 
-  async accept(followerId: string, followingId: string) {
+  async acceptRequest(followerId: string, followingId: string) {
     const requestData = await this.friendsRepository.findOne({
       where: { followerId, followingId, friend: false },
     });
@@ -120,7 +120,7 @@ export class FriendService {
     await this.friendsRepository.save(inverseData);
   }
 
-  async remove(targetId: string, userId: string) {
+  async unfriend(targetId: string, userId: string) {
     const targetUser = await this.usersRepository
       .findOne({ where: { id: targetId } })
       .catch((err) => console.log(err));

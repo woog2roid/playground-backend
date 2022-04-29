@@ -40,8 +40,8 @@ export class UserController {
 
   @ApiOperation({ summary: 'id로 유저 검색' })
   @Get('/')
-  async findById(@Query('id') id: string) {
-    return this.userService.findById(id);
+  async findUserById(@Query('id') id: string) {
+    return this.userService.findUserById(id);
   }
 
   @ApiOperation({ summary: '회원 가입' })

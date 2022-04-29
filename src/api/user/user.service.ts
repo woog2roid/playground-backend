@@ -17,7 +17,7 @@ export class UserService {
     private connection: Connection,
   ) {}
 
-  async findById(id: string) {
+  async findUserById(id: string) {
     const user = await this.usersRepository
       .findOne({ where: { id } })
       .catch((err) => console.log(err));
