@@ -58,7 +58,7 @@ export class FriendController {
 
   @ApiOperation({ summary: '친구 삭제' })
   @Delete('/')
-  unfriend(@Query('id') targetId: string, @User() user: Users) {
+  async unfriend(@Query('id') targetId: string, @User() user: Users) {
     return this.friendService.unfriend(targetId, user.id);
   }
 }
