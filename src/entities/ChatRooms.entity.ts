@@ -20,9 +20,6 @@ export class ChatRooms {
   @PrimaryGeneratedColumn({ name: 'id', type: 'int' })
   id: number;
 
-  @Column({ name: 'title', type: 'varchar' })
-  title: string;
-
   @CreateDateColumn()
   createdAt: Date;
 

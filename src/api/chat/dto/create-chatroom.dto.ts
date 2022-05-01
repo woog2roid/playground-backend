@@ -1,19 +1,11 @@
-import { ApiProperty, PickType } from '@nestjs/swagger';
-import {
-  IsNotEmpty,
-  IsArray,
-  IsString,
-  ArrayMinSize,
-  MaxLength,
-} from 'class-validator';
-import { ChatRooms } from 'src/entities/ChatRooms.entity';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsArray, IsString, ArrayMinSize, MaxLength } from 'class-validator';
 
-export class CreateChatRoomDto extends PickType(ChatRooms, ['title'] as const) {
+export class CreateChatRoomDto {
   @IsString()
-  @IsNotEmpty()
   @ApiProperty({
     example: '테스트용 채팅방',
-    description: '채팅방 이름',
+    description: '채팅방 이름, 개인채팅방 생성 시에는 필요 없음.',
   })
   public title: string;
 

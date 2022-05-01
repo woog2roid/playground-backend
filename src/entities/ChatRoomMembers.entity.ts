@@ -32,6 +32,10 @@ export class ChatRoomMembers {
   @Column({ name: 'chatRoomId', type: 'int' })
   chatRoomId: number;
 
+  //사람마다 같은 채팅방을 이름을 다 다르게 저장할 수 있도록!
+  @Column({ name: 'chatRoomTitle', type: 'varchar' })
+  chatRoomTitle: string;
+
   @Column({ name: 'userId', type: 'varchar' })
   userId: string;
 

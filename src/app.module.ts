@@ -7,7 +7,7 @@ import ormconfig from 'ormconfig';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './api/user/user.module';
 import { FriendModule } from './api/friend/friend.module';
-import { ChatsModule } from './api/chats/chats.module';
+import { ChatModule } from './api/chat/chat.module';
 
 import { AppController } from './app.controller';
 
@@ -18,7 +18,7 @@ import { AppController } from './app.controller';
     UserModule,
     AuthModule,
     FriendModule,
-    ChatsModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [],
