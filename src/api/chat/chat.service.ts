@@ -21,10 +21,14 @@ export class ChatService {
   ) {}
 
   async getAllChatRooms(userId: string) {
-    const chatRooms = await this.chatRoomMembersRepository.find({
-      where: { userId },
-      select: ['chatRoomId', 'chatRoomTitle'],
-    });
+    const chatRooms = await this.chatRoomMembersRepository
+      .createQueryBuilder('chatRoomMembers')
+      .select([
+        'chatRoomMembers.chatRoomId AS id',
+        'chatRoomMembers.chatRoomTitle AS title',
+      ])
+      .where('chatRoomMembers.userId = :userId', { userId })
+      .getRawMany();
 
     return chatRooms;
   }
