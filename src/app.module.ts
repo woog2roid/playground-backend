@@ -9,6 +9,8 @@ import { UserModule } from './api/user/user.module';
 import { FriendModule } from './api/friend/friend.module';
 import { ChatsModule } from './api/chats/chats.module';
 
+import { AppController } from './app.controller';
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -18,7 +20,7 @@ import { ChatsModule } from './api/chats/chats.module';
     FriendModule,
     ChatsModule,
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [],
 })
 export class AppModule {}
