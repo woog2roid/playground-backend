@@ -27,12 +27,14 @@ export class FriendController {
   @ApiOperation({ summary: '모든 친구 관계 불러오기' })
   @Get('/')
   async getAllRelations(@User() user: Users) {
+    console.log('모든 친구 관계 불러오기');
     return this.friendService.getAllRelations(user.id);
   }
 
   @ApiOperation({ summary: '친구 요청 보내기' })
   @Post('/request/:id')
   async sendRequest(@Param('id') targetId: string, @User() user: Users) {
+    console.log('친구 요청 보내기');
     return this.friendService.sendRequest(targetId, user.id);
   }
 
@@ -43,6 +45,7 @@ export class FriendController {
     @Query('id') targetId: string,
     @User() user: Users,
   ) {
+    console.log('친구 요청 거절 및 친구 요청 취소');
     if (relation === 'follower') {
       return this.friendService.cancelRequest(targetId, user.id);
     } else if (relation === 'following') {
@@ -53,12 +56,14 @@ export class FriendController {
   @ApiOperation({ summary: '친구 요청 수락' })
   @Post('/accept/:id')
   async acceptRequest(@Param('id') targetId: string, @User() user: Users) {
+    console.log('친구 요청 수락');
     return this.friendService.acceptRequest(targetId, user.id);
   }
 
   @ApiOperation({ summary: '친구 삭제' })
   @Delete('/')
   async unfriend(@Query('id') targetId: string, @User() user: Users) {
+    console.log('친구 삭제');
     return this.friendService.unfriend(targetId, user.id);
   }
 }

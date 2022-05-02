@@ -27,11 +27,13 @@ import { SendChatDto } from './dto/send-chat.dto';
 @UseGuards(LoggedInGuard)
 @Controller('/chat-room')
 export class ChatController {
+  //후에 추가할 기능: 채팅방 나가기.
   constructor(private readonly chatsService: ChatService) {}
 
   @ApiOperation({ summary: '모든 채팅방 불러오기' })
   @Get('/')
   async getAllChatRooms(@User() user: Users) {
+    console.log('모든 채팅방 불러오기');
     return this.chatsService.getAllChatRooms(user.id);
   }
 
@@ -41,6 +43,7 @@ export class ChatController {
     @Body() createChatRoomDto: CreateChatRoomDto,
     @Query('dm') isDm: boolean,
   ) {
+    console.log('채팅방 생성하기');
     if (isDm) {
       return this.chatsService.createDmChatRoom(createChatRoomDto.members);
     } else {
@@ -54,6 +57,7 @@ export class ChatController {
   @ApiOperation({ summary: '채팅방 멤버 불러오기' })
   @Get('/:id/member')
   async getChatRoomMembers(@Param('id') roomId: string) {
+    console.log('채팅방 멤버 불러오기');
     return this.chatsService.getChatRoomMembers(+roomId);
   }
 
@@ -63,6 +67,7 @@ export class ChatController {
     @Param('id') roomId: string,
     @Body() inviteMemberDto: InviteMemberDto,
   ) {
+    console.log('채팅방에 멤버 초대하기');
     return this.chatsService.inviteChatRoomMember(
       +roomId,
       inviteMemberDto.members,
@@ -72,6 +77,7 @@ export class ChatController {
   @ApiOperation({ summary: '채팅방의 채팅 불러오기' })
   @Get('/:id/chat')
   async getChatRoomChats(@Param('id') roomId: string) {
+    console.log('채팅방의 채팅 불러오기');
     return this.chatsService.getChatRoomChats(+roomId);
   }
 
@@ -81,6 +87,7 @@ export class ChatController {
     @Param('id') roomId: string,
     @Body() sendChatDto: SendChatDto,
   ) {
+    console.log('채팅방에 채팅 생성하기');
     return this.chatsService.sendChatRoomChat(+roomId, sendChatDto.message);
   }
 }

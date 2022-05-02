@@ -31,6 +31,7 @@ export class UserController {
   @ApiCookieAuth('connect.sid')
   @Get('/me')
   async getMyProfile(@User() user: Users) {
+    console.log('본인 정보 불러오기');
     if (user) {
       return user;
     } else {
@@ -38,9 +39,10 @@ export class UserController {
     }
   }
 
-  @ApiOperation({ summary: 'id로 유저 검색' })
+  @ApiOperation({ summary: '아이디로 유저 검색' })
   @Get('/')
   async findUserById(@Query('id') id: string) {
+    console.log('아이디로 유저 검색');
     return this.userService.findUserById(id);
   }
 
@@ -48,6 +50,7 @@ export class UserController {
   @UseGuards(NotLoggedInGuard)
   @Post('/join')
   async join(@Body() data: JoinRequestDto) {
+    console.log('회원 가입');
     return this.userService.join(data.id, data.nickname, data.password);
   }
 
@@ -56,6 +59,7 @@ export class UserController {
   @UseGuards(LoggedInGuard)
   @Delete('/quit')
   async delete(@User() user: Users) {
+    console.log('회원 탈퇴');
     return this.userService.delete(user.id);
   }
 
@@ -63,6 +67,7 @@ export class UserController {
   @UseGuards(LocalAuthGuard)
   @Post('/login')
   async login(@User() user: Users) {
+    console.log('로그인');
     return user;
   }
 
@@ -71,6 +76,7 @@ export class UserController {
   @UseGuards(LoggedInGuard)
   @Post('/logout')
   async logout(@Response() res, @Request() req) {
+    console.log('로그아웃');
     req.session.destroy(() => {
       res.clearCookie('connect.sid', { httpOnly: true }).sendStatus(200);
     });
