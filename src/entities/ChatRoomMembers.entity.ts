@@ -36,8 +36,8 @@ export class ChatRoomMembers {
   @Column({ name: 'chatRoomTitle', type: 'varchar' })
   chatRoomTitle: string;
 
-  @Column({ name: 'userId', type: 'varchar' })
-  userId: string;
+  @Column({ name: 'memberId', type: 'varchar' })
+  memberId: string;
 
   @ManyToOne(() => ChatRooms, (chatRoom) => chatRoom.members, {
     onDelete: 'CASCADE',
@@ -50,6 +50,6 @@ export class ChatRoomMembers {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
-  @JoinColumn([{ name: 'userId', referencedColumnName: 'id' }])
-  user: Users;
+  @JoinColumn([{ name: 'memberId', referencedColumnName: 'id' }])
+  member: Users;
 }

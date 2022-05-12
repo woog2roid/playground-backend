@@ -7,6 +7,8 @@ import { ChatRooms } from 'src/entities/ChatRooms.entity';
 import { Chats } from 'src/entities/Chats.entity';
 import { Users } from 'src/entities/Users.entity';
 
+import { SocketGateway } from '../../socket/socket.gateway';
+
 @Injectable()
 export class ChatService {
   constructor(
@@ -18,16 +20,17 @@ export class ChatService {
     private chatRoomMembersRepository: Repository<ChatRoomMembers>,
     @InjectRepository(Users)
     private usersRepository: Repository<Users>,
+    private readonly socketGateway: SocketGateway,
   ) {}
 
-  async getAllChatRooms(userId: string) {
+  async getAllChatRooms(memberId: string) {
     const chatRooms = await this.chatRoomMembersRepository
       .createQueryBuilder('chatRoomMembers')
       .select([
         'chatRoomMembers.chatRoomId AS id',
         'chatRoomMembers.chatRoomTitle AS title',
       ])
-      .where('chatRoomMembers.userId = :userId', { userId })
+      .where('chatRoomMembers.memberId = :memberId', { memberId })
       .getRawMany();
 
     return chatRooms;
@@ -51,13 +54,13 @@ export class ChatService {
 
     const chatRoomMembers1 = new ChatRoomMembers();
     chatRoomMembers1.chatRoomId = savedChatRoom.id;
-    chatRoomMembers1.userId = member1.id;
+    chatRoomMembers1.memberId = member1.id;
     chatRoomMembers1.chatRoomTitle = `${member2.nickname}님`;
     await this.chatRoomMembersRepository.save(chatRoomMembers1);
 
     const chatRoomMembers2 = new ChatRoomMembers();
     chatRoomMembers2.chatRoomId = savedChatRoom.id;
-    chatRoomMembers2.userId = member2.id;
+    chatRoomMembers2.memberId = member2.id;
     chatRoomMembers2.chatRoomTitle = `${member1.nickname}님`;
     await this.chatRoomMembersRepository.save(chatRoomMembers2);
   }
@@ -70,7 +73,7 @@ export class ChatService {
     for (const membersId of members) {
       const chatRoomMembers = new ChatRoomMembers();
       chatRoomMembers.chatRoomId = savedChatRoom.id;
-      chatRoomMembers.userId = membersId;
+      chatRoomMembers.memberId = membersId;
       chatRoomMembers.chatRoomTitle = title;
       await this.chatRoomMembersRepository.save(chatRoomMembers);
     }
@@ -79,10 +82,10 @@ export class ChatService {
   async getChatRoomMembers(chatRoomId: number) {
     const chatRoomMembers = await this.chatRoomMembersRepository
       .createQueryBuilder('chatRoomMembers')
-      .innerJoin('chatRoomMembers.user', 'user')
-      .select(['user.id', 'user.nickname'])
-      .where('chatRoomMemebers.chatRoomId = :chatRoomId', { chatRoomId })
-      .getMany();
+      .innerJoin('chatRoomMembers.member', 'member')
+      .select(['member.id AS id', 'member.nickname AS nickname'])
+      .where('chatRoomMembers.chatRoomId = :chatRoomId', { chatRoomId })
+      .getRawMany();
 
     return chatRoomMembers;
   }
@@ -91,16 +94,46 @@ export class ChatService {
     for (const membersId of members) {
       const chatRoomMembers = new ChatRoomMembers();
       chatRoomMembers.chatRoomId = chatRoomId;
-      chatRoomMembers.userId = membersId;
+      chatRoomMembers.memberId = membersId;
       await this.chatRoomMembersRepository.save(chatRoomMembers);
     }
   }
 
-  async getChatRoomChats(chatRoomId: number) {
-    //채팅방의 채팅 불러오기
+  async getChatRoomChats(chatRoomId: number, page: number) {
+    /*
+      return this.chatsRepository
+        .createQueryBuilder('chats')
+        .innerJoin('chats.room', 'room', 'room.id = :chatRoomId', {
+          chatRoomId,
+        })
+        .innerJoinAndSelect('chats.sender', 'user')
+        .orderBy('chats.createdAt', 'DESC')
+        .take(100)
+        .skip(100 * (page - 1))
+        .getMany();
+    */
   }
 
-  async sendChatRoomChat(chatRoomId: number, message: string) {
-    //채팅방에 채팅 생성하기
+  async sendChatRoomChat(
+    chatRoomId: number,
+    senderId: string,
+    message: string,
+  ) {
+    /*
+      const newChat = new Chats();
+      newChat.senderId = senderId;
+      newChat.roomId = chatRoomId;
+      newChat.message = message;
+      const savedChat = await this.chatsRepository.save(newChat);
+
+      const chatWithInfo = await this.chatsRepository.findOne({
+        where: { id: savedChat.id },
+        relations: ['Users', 'ChatRooms'],
+      });
+
+      this.socketGateway.server
+        .to(`/chat-${chatWithInfo.roomId}`)
+        .emit('message', chatWithInfo);
+    */
   }
 }

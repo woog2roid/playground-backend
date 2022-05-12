@@ -76,9 +76,12 @@ export class ChatController {
 
   @ApiOperation({ summary: '채팅방의 채팅 불러오기' })
   @Get('/:id/chat')
-  async getChatRoomChats(@Param('id') roomId: string) {
+  async getChatRoomChats(
+    @Param('id') roomId: string,
+    @Query('page') page: string,
+  ) {
     console.log('채팅방의 채팅 불러오기');
-    return this.chatsService.getChatRoomChats(+roomId);
+    return this.chatsService.getChatRoomChats(+roomId, +page);
   }
 
   @ApiOperation({ summary: '채팅방에 채팅 생성하기' })
@@ -86,8 +89,13 @@ export class ChatController {
   async sendChatRoomChat(
     @Param('id') roomId: string,
     @Body() sendChatDto: SendChatDto,
+    @User() user: Users,
   ) {
     console.log('채팅방에 채팅 생성하기');
-    return this.chatsService.sendChatRoomChat(+roomId, sendChatDto.message);
+    return this.chatsService.sendChatRoomChat(
+      +roomId,
+      user.id,
+      sendChatDto.message,
+    );
   }
 }

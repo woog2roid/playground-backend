@@ -23,8 +23,8 @@ export class Chats {
   @Column({ name: 'senderId', type: 'string' })
   senderId: string;
 
-  @Column({ name: 'roomId', type: 'string' })
-  roomId: string;
+  @Column({ name: 'roomId', type: 'int' })
+  roomId: number;
 
   @Column({ name: 'message', type: 'text' })
   message: string;
