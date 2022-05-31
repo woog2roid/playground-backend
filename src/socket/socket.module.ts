@@ -5,4 +5,4 @@ import { SocketGateway } from './socket.gateway';
   providers: [SocketGateway],
   exports: [SocketGateway],
 })
-export class EventsModule {}
+export class SocketModule {}

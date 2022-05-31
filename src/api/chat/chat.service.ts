@@ -36,6 +36,14 @@ export class ChatService {
     return chatRooms;
   }
 
+  async sendSystemChat(chatRoomId: number, message: string) {
+    const newChat = new Chats();
+    newChat.senderId = 'admin';
+    newChat.roomId = chatRoomId;
+    newChat.message = message;
+    const savedChat = await this.chatsRepository.save(newChat);
+  }
+
   async createDmChatRoom(members: string[]) {
     const chatRoom = new ChatRooms();
     const savedChatRoom = await this.chatRoomsRepository.save(chatRoom);
@@ -63,9 +71,12 @@ export class ChatService {
     chatRoomMembers2.memberId = member2.id;
     chatRoomMembers2.chatRoomTitle = `${member1.nickname}님`;
     await this.chatRoomMembersRepository.save(chatRoomMembers2);
+
+    await this.sendSystemChat(savedChatRoom.id, '채팅방이 생성되었습니다.');
   }
 
   async createGroupChatRoom(members: string[], title: string) {
+    console.log(members, title);
     const chatRoom = new ChatRooms();
     const savedChatRoom = await this.chatRoomsRepository.save(chatRoom);
     console.log(savedChatRoom);
@@ -77,6 +88,8 @@ export class ChatService {
       chatRoomMembers.chatRoomTitle = title;
       await this.chatRoomMembersRepository.save(chatRoomMembers);
     }
+
+    await this.sendSystemChat(savedChatRoom.id, '채팅방이 생성되었습니다.');
   }
 
   async getChatRoomMembers(chatRoomId: number) {
@@ -97,21 +110,21 @@ export class ChatService {
       chatRoomMembers.memberId = membersId;
       await this.chatRoomMembersRepository.save(chatRoomMembers);
     }
+
+    await this.sendSystemChat(chatRoomId, '새로운 멤버를 초대하였습니다.');
   }
 
   async getChatRoomChats(chatRoomId: number, page: number) {
-    /*
-      return this.chatsRepository
-        .createQueryBuilder('chats')
-        .innerJoin('chats.room', 'room', 'room.id = :chatRoomId', {
-          chatRoomId,
-        })
-        .innerJoinAndSelect('chats.sender', 'user')
-        .orderBy('chats.createdAt', 'DESC')
-        .take(100)
-        .skip(100 * (page - 1))
-        .getMany();
-    */
+    return this.chatsRepository
+      .createQueryBuilder('chats')
+      .innerJoin('chats.room', 'room', 'room.id = :chatRoomId', {
+        chatRoomId,
+      })
+      .innerJoinAndSelect('chats.sender', 'sender')
+      .orderBy('chats.createdAt')
+      .take(100)
+      .skip(100 * (page - 1))
+      .getMany();
   }
 
   async sendChatRoomChat(
@@ -119,21 +132,19 @@ export class ChatService {
     senderId: string,
     message: string,
   ) {
-    /*
-      const newChat = new Chats();
-      newChat.senderId = senderId;
-      newChat.roomId = chatRoomId;
-      newChat.message = message;
-      const savedChat = await this.chatsRepository.save(newChat);
+    const newChat = new Chats();
+    newChat.senderId = senderId;
+    newChat.roomId = chatRoomId;
+    newChat.message = message;
+    const savedChat = await this.chatsRepository.save(newChat);
 
-      const chatWithInfo = await this.chatsRepository.findOne({
-        where: { id: savedChat.id },
-        relations: ['Users', 'ChatRooms'],
-      });
+    const chatWithInfo = await this.chatsRepository.findOne({
+      where: { id: savedChat.id },
+      relations: ['sender', 'room'],
+    });
 
-      this.socketGateway.server
-        .to(`/chat-${chatWithInfo.roomId}`)
-        .emit('message', chatWithInfo);
-    */
+    this.socketGateway.server
+      .to(`/chat-${chatWithInfo.roomId}`)
+      .emit('message', chatWithInfo);
   }
 }

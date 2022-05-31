@@ -11,25 +11,14 @@ import {
 import { Server, Socket } from 'socket.io';
 import { socketMemory as memory } from './socket-memory';
 
-@WebSocketGateway({ namespace: /\/ws-.+/ })
+@WebSocketGateway({ namespace: 'chat' || 'game' })
 export class SocketGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer() public server: Server;
 
-  //afterInit, handdle Connection, disconnection 등은 이미
-  //만들어져있는 친구들이라 따로 @SubscirbeMessage가 없어도 되는거고
-  //그 외의 것들에 반응하려면 SubscribeMessage안에 message 넣어줘야함
-  //예시
-  /*
-  @SubscribeMessage('test')
-  handleTest(@MessageBody() data: string) {
-    console.log('test', data);
-  }
-  */
-
   afterInit(server: Server): any {
-    console.log('server Initialized.');
+    console.log('[Web-Socket Server Initialized.]');
   }
 
   handleConnection(@ConnectedSocket() socket: Socket) {
@@ -37,14 +26,27 @@ export class SocketGateway
     if (!memory[socket.nsp.name]) {
       memory[socket.nsp.name] = {};
     }
-    // broadcast to all clients in the given sub-namespace
-    //socket.emit('hello', socket.nsp.name);
   }
+
+  /*
+@SubscribeMessage('login')
+  handleLogin(
+    @MessageBody() data: { id: number; channels: number[] },
+    @ConnectedSocket() socket: Socket,
+  ) {
+    const newNamespace = socket.nsp;
+    console.log('login', newNamespace);
+    onlineMap[socket.nsp.name][socket.id] = data.id;
+    newNamespace.emit('onlineList', Object.values(onlineMap[socket.nsp.name]));
+    data.channels.forEach((channel) => {
+      console.log('join', socket.nsp.name, channel);
+      socket.join(`${socket.nsp.name}-${channel}`);
+    });
+  }
+  */
 
   handleDisconnect(@ConnectedSocket() socket: Socket) {
     console.log('disconnected', socket.nsp.name);
     delete memory[socket.nsp.name][socket.id];
-    //const newNamespace = socket.nsp;
-    //newNamespace.emit('onlineList', Object.values(memory[socket.nsp.name]));
   }
 }
