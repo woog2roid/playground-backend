@@ -7,6 +7,8 @@
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "seed:config": "ts-node ./node_modules/typeorm-seeding/dist/cli.js config",
+    "seed:run": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed",
     "start": "nest start",
     "start:dev": "nest build --webpack --webpackPath webpack-hmr.config.ts --watch",
     "start:debug": "nest start --debug --watch",
@@ -43,7 +45,8 @@
     "rxjs": "^7.2.0",
     "start-server-nestjs-webpack-plugin": "^2.2.5",
     "swagger-ui-express": "^4.3.0",
-    "typeorm": "^0.2.45"
+    "typeorm": "^0.2.45",
+    "typeorm-seeding": "^1.6.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^8.0.0",
