@@ -6,7 +6,7 @@ import {
 
 import { Connection, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Users } from '../../entities/Users.entity';
+import { Users } from '../../database/entities/Users.entity';
 
 import bcrypt from 'bcrypt';
 

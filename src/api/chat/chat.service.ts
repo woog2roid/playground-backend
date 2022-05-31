@@ -2,10 +2,10 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ChatRoomMembers } from 'src/entities/ChatRoomMembers.entity';
-import { ChatRooms } from 'src/entities/ChatRooms.entity';
-import { Chats } from 'src/entities/Chats.entity';
-import { Users } from 'src/entities/Users.entity';
+import { ChatRoomMembers } from 'src/database/entities/ChatRoomMembers.entity';
+import { ChatRooms } from 'src/database/entities/ChatRooms.entity';
+import { Chats } from 'src/database/entities/Chats.entity';
+import { Users } from 'src/database/entities/Users.entity';
 
 import { SocketGateway } from '../../socket/socket.gateway';
 

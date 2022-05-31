@@ -3,12 +3,12 @@ import { ChatService } from './chat.service';
 import { ChatController } from './chat.controller';
 
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Users } from '../../entities/Users.entity';
-import { Friends } from '../../entities/Friends.entity';
-import { Chats } from '../../entities/Chats.entity';
-import { ChatRooms } from '../../entities/ChatRooms.entity';
+import { Users } from '../../database/entities/Users.entity';
+import { Friends } from '../../database/entities/Friends.entity';
+import { Chats } from '../../database/entities/Chats.entity';
+import { ChatRooms } from '../../database/entities/ChatRooms.entity';
 import { SocketModule } from 'src/socket/socket.module';
-import { ChatRoomMembers } from 'src/entities/ChatRoomMembers.entity';
+import { ChatRoomMembers } from 'src/database/entities/ChatRoomMembers.entity';
 
 @Module({
   imports: [

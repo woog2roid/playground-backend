@@ -1,6 +1,6 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
-import { Users } from '../../../entities/Users.entity';
+import { Users } from '../../../database/entities/Users.entity';
 
 export class JoinRequestDto extends PickType(Users, [
   'id',

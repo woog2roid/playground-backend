@@ -15,7 +15,7 @@ import { FriendService } from './friend.service';
 import { LoggedInGuard } from 'src/auth/is-logged-in.guards';
 
 import { User } from '../../utils/request-user.decorator';
-import { Users } from '../../entities/Users.entity';
+import { Users } from '../../database/entities/Users.entity';
 
 @ApiTags('Friend')
 @ApiCookieAuth('connect.sid')

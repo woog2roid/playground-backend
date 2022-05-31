@@ -1,6 +1,6 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
-import { Chats } from 'src/entities/Chats.entity';
+import { Chats } from 'src/database/entities/Chats.entity';
 
 export class SendChatDto extends PickType(Chats, ['message'] as const) {
   @IsString()

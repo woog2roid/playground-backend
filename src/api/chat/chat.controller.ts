@@ -14,7 +14,7 @@ import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LoggedInGuard } from 'src/auth/is-logged-in.guards';
 
 import { User } from 'src/utils/request-user.decorator';
-import { Users } from 'src/entities/Users.entity';
+import { Users } from 'src/database/entities/Users.entity';
 
 import { ChatService } from './chat.service';
 
