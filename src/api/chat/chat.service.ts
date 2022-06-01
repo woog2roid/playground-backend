@@ -8,6 +8,7 @@ import { Chats } from 'src/database/entities/Chats.entity';
 import { Users } from 'src/database/entities/Users.entity';
 
 import { SocketGateway } from '../../socket/socket.gateway';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ChatService {
@@ -21,6 +22,7 @@ export class ChatService {
     @InjectRepository(Users)
     private usersRepository: Repository<Users>,
     private readonly socketGateway: SocketGateway,
+    private readonly config: ConfigService,
   ) {}
 
   async getAllChatRooms(memberId: string) {
@@ -38,7 +40,7 @@ export class ChatService {
 
   async sendSystemChat(chatRoomId: number, message: string) {
     const newChat = new Chats();
-    newChat.senderId = 'admin';
+    newChat.senderId = this.config.get('ADMIN_ID');
     newChat.roomId = chatRoomId;
     newChat.message = message;
     const savedChat = await this.chatsRepository.save(newChat);

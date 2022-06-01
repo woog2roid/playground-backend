@@ -10,6 +10,8 @@ import { ChatRooms } from '../../database/entities/ChatRooms.entity';
 import { SocketModule } from 'src/socket/socket.module';
 import { ChatRoomMembers } from 'src/database/entities/ChatRoomMembers.entity';
 
+import { ConfigService } from '@nestjs/config';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -20,6 +22,7 @@ import { ChatRoomMembers } from 'src/database/entities/ChatRoomMembers.entity';
       ChatRoomMembers,
     ]),
     SocketModule,
+    ConfigService,
   ],
   controllers: [ChatController],
   providers: [ChatService],
