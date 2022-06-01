@@ -26,6 +26,7 @@ export class ChatService {
   ) {}
 
   async getAllChatRooms(memberId: string) {
+    //getChatRoom
     const chatRooms = await this.chatRoomMembersRepository
       .createQueryBuilder('chatRoomMembers')
       .select([
@@ -35,7 +36,33 @@ export class ChatService {
       .where('chatRoomMembers.memberId = :memberId', { memberId })
       .getRawMany();
 
-    return chatRooms;
+    //getChatRoomsLastChatTimeStamp
+    const chatRoomsSortedByChat = await Promise.all(
+      chatRooms.map(async (chatRoom) => {
+        const chatRoomId = chatRoom.id;
+        const lastChat = await this.chatsRepository
+          .createQueryBuilder('chats')
+          .select(['chats.createdAt AS timeStamp'])
+          .where('chats.roomId = :chatRoomId', { chatRoomId })
+          .orderBy('chats.createdAt', 'DESC')
+          .take(1)
+          .getRawOne();
+
+        const chatRoomWithLastChatTimestamp = chatRoom;
+        chatRoomWithLastChatTimestamp.lastChatTimeStamp = lastChat?.timeStamp;
+
+        return chatRoomWithLastChatTimestamp;
+      }),
+    );
+
+    //sortChatRoomByLastChat
+    chatRoomsSortedByChat.sort((a, b) => {
+      const dateA = new Date(a.lastChatTimeStamp).getTime();
+      const dateB = new Date(b.lastChatTimeStamp).getTime();
+      return dateA < dateB ? 1 : -1;
+    });
+
+    return chatRoomsSortedByChat;
   }
 
   async sendSystemChat(chatRoomId: number, message: string) {
