@@ -29,6 +29,9 @@ export class Chats {
   @Column({ name: 'message', type: 'text' })
   message: string;
 
+  @Column({ name: 'system', type: 'boolean' })
+  system: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 

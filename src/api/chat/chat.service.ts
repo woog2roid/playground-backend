@@ -70,6 +70,7 @@ export class ChatService {
     newChat.senderId = this.config.get('ADMIN_ID');
     newChat.roomId = chatRoomId;
     newChat.message = message;
+    newChat.system = true;
     const savedChat = await this.chatsRepository.save(newChat);
   }
 
@@ -165,6 +166,7 @@ export class ChatService {
     newChat.senderId = senderId;
     newChat.roomId = chatRoomId;
     newChat.message = message;
+    newChat.system = false;
     const savedChat = await this.chatsRepository.save(newChat);
 
     const chatWithInfo = await this.chatsRepository.findOne({
