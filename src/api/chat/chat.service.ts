@@ -7,7 +7,7 @@ import { ChatRooms } from 'src/database/entities/ChatRooms.entity';
 import { Chats } from 'src/database/entities/Chats.entity';
 import { Users } from 'src/database/entities/Users.entity';
 
-import { SocketGateway } from '../../socket/socket.gateway';
+import { ChatSocketGateway } from '../../socket/chat-socket.gateway';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -21,7 +21,7 @@ export class ChatService {
     private chatRoomMembersRepository: Repository<ChatRoomMembers>,
     @InjectRepository(Users)
     private usersRepository: Repository<Users>,
-    private readonly socketGateway: SocketGateway,
+    private readonly chatSocketGateway: ChatSocketGateway,
     private readonly config: ConfigService,
   ) {}
 
@@ -172,8 +172,8 @@ export class ChatService {
       relations: ['sender', 'room'],
     });
 
-    this.socketGateway.server
-      .to(`/chat-${chatWithInfo.roomId}`)
+    this.chatSocketGateway.server
+      .to(`${chatWithInfo.roomId}`)
       .emit('message', chatWithInfo);
   }
 }
