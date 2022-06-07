@@ -10,10 +10,25 @@ import cookieParser from 'cookie-parser';
 import passport from 'passport';
 import session from 'express-session';
 
+import fs from 'fs';
+
 declare const module: any;
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const httpsOptions =
+    process.env.NODE_ENV === 'production'
+      ? {
+          key: fs.readFileSync(process.env.PRIVKEY, 'utf8'),
+          cert: fs.readFileSync(process.env.CERT, 'utf8'),
+          ca: fs.readFileSync(process.env.CA, 'utf8'),
+        }
+      : undefined;
+
+  const app = httpsOptions
+    ? await NestFactory.create(AppModule, {
+        httpsOptions,
+      })
+    : await NestFactory.create(AppModule);
 
   if (module.hot) {
     module.hot.accept();
@@ -28,12 +43,7 @@ async function bootstrap() {
   );
 
   app.enableCors({
-    origin: [
-      'https://woog2roid.github.io',
-      'https://service.woog2roid.dev',
-      'https://todo.woog2roid.dev',
-      'https://mil-frontend-tcuwk.run.goorm.io',
-    ],
+    origin: [process.env.CORS_PROD, process.env.CORS_DEV],
     credentials: true,
   });
 
