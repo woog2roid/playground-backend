@@ -151,7 +151,7 @@ export class ChatService {
         chatRoomId,
       })
       .innerJoinAndSelect('chats.sender', 'sender')
-      .orderBy('chats.createdAt')
+      .orderBy('chats.createdAt', 'DESC')
       .take(100)
       .skip(100 * (page - 1))
       .getMany();
