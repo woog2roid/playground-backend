@@ -30,11 +30,25 @@ export class ChatController {
   //후에 추가할 기능: 채팅방 나가기.
   constructor(private readonly chatsService: ChatService) {}
 
-  @ApiOperation({ summary: '모든 채팅방 불러오기' })
+  @ApiOperation({
+    summary: '모든 채팅방 불러오기(정렬 / 안 읽은 채팅 기능 추가)',
+  })
   @Get('/')
-  async getAllChatRooms(@User() user: Users) {
+  async getAllChatRoomsOrderedByLastChatWithUnreadCounts(@User() user: Users) {
     console.log('모든 채팅방 불러오기');
-    return this.chatsService.getAllChatRooms(user.id);
+    return this.chatsService.getAllChatRoomsOrderedByLastChatWithUnreadCounts(
+      user.id,
+    );
+  }
+
+  @ApiOperation({ summary: '마지막으로 채팅방에 접속한 시간 기록하기' })
+  @Post('/:id/last-read')
+  async recordLastReadTimestamp(
+    @User() user: Users,
+    @Param('id') chatRoomId: number,
+  ) {
+    console.log('마지막으로 채팅방에 접속한 시간 기록하기');
+    return this.chatsService.recordLastReadTimestamp(user.id, +chatRoomId);
   }
 
   @ApiOperation({ summary: '채팅방 생성하기' })

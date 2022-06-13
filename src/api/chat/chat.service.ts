@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { ChatRoomMembers } from 'src/database/entities/ChatRoomMembers.entity';
 import { ChatRooms } from 'src/database/entities/ChatRooms.entity';
 import { Chats } from 'src/database/entities/Chats.entity';
@@ -26,7 +26,6 @@ export class ChatService {
   ) {}
 
   async getAllChatRooms(memberId: string) {
-    //getChatRoom
     const chatRooms = await this.chatRoomMembersRepository
       .createQueryBuilder('chatRoomMembers')
       .select([
@@ -36,8 +35,14 @@ export class ChatService {
       .where('chatRoomMembers.memberId = :memberId', { memberId })
       .getRawMany();
 
+    return chatRooms;
+  }
+
+  async getAllChatRoomsOrderedByLastChat(memberId: string) {
+    const chatRooms = await this.getAllChatRooms(memberId);
+
     //getChatRoomsLastChatTimeStamp
-    const chatRoomsSortedByChat = await Promise.all(
+    const chatRoomWithLastChatTimestamp = await Promise.all(
       chatRooms.map(async (chatRoom) => {
         const chatRoomId = chatRoom.id;
         const lastChat = await this.chatsRepository
@@ -56,13 +61,59 @@ export class ChatService {
     );
 
     //sortChatRoomByLastChat
-    chatRoomsSortedByChat.sort((a, b) => {
-      const dateA = new Date(a.lastChatTimeStamp).getTime();
-      const dateB = new Date(b.lastChatTimeStamp).getTime();
-      return dateA < dateB ? 1 : -1;
+    const chatRoomsOrderedByLastChat = chatRoomWithLastChatTimestamp.sort(
+      (a, b) => {
+        const dateA = new Date(a.lastChatTimeStamp).getTime();
+        const dateB = new Date(b.lastChatTimeStamp).getTime();
+        return dateA < dateB ? 1 : -1;
+      },
+    );
+
+    return chatRoomsOrderedByLastChat;
+  }
+
+  async getAllChatRoomsOrderedByLastChatWithUnreadCounts(memberId: string) {
+    const chatRoomsOrderedByLastChat =
+      await this.getAllChatRoomsOrderedByLastChat(memberId);
+
+    const ChatRoomsOrderedByLastChatWithUnreadCounts = await Promise.all(
+      chatRoomsOrderedByLastChat.map(async (chatRoom) => {
+        const chatRoomId = chatRoom.id;
+
+        const lastRead = await this.chatRoomMembersRepository
+          .createQueryBuilder('chatRoomMembers')
+          .select(['chatRoomMembers.lastRead AS timeStamp'])
+          .where('chatRoomMembers.chatRoomId = :chatRoomId', { chatRoomId })
+          .andWhere('chatRoomMembers.memberId = :memberId', { memberId })
+          .getRawOne();
+
+        const unreadCounts = await this.chatsRepository.count({
+          where: {
+            roomId: chatRoomId,
+            createdAt: MoreThan(new Date(lastRead.timeStamp)),
+          },
+        });
+
+        const chatRoomWithUnreadsCounts = chatRoom;
+        chatRoomWithUnreadsCounts.unreads = unreadCounts;
+
+        return chatRoomWithUnreadsCounts;
+      }),
+    );
+
+    return ChatRoomsOrderedByLastChatWithUnreadCounts;
+  }
+
+  async recordLastReadTimestamp(memberId: string, chatRoomId: number) {
+    const chatRoomMember = await this.chatRoomMembersRepository.findOne({
+      where: { memberId, chatRoomId },
     });
 
-    return chatRoomsSortedByChat;
+    const updatedChatRoomMember = chatRoomMember;
+    updatedChatRoomMember.lastRead = new Date();
+
+    await this.chatRoomMembersRepository.save(updatedChatRoomMember);
+    return;
   }
 
   async sendSystemChat(chatRoomId: number, message: string) {
